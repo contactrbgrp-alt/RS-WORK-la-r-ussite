@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RS-WORK | Bibliothèque de Révision</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <nav class="navbar dash-nav">
+        <div class="container">
+            <div class="logo"><i data-lucide="brain-circuit"></i><span>RS-WORK</span></div>
+            <div class="user-profile">
+                <button id="theme-toggle" class="theme-btn"><i data-lucide="sun"></i><i data-lucide="moon"></i></button>
+                <button class="btn btn-outline btn-sm logout-btn">Déconnexion</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="payment-lock" class="modal active hidden">
+        <div class="modal-content payment-modal">
+            <i data-lucide="lock" class="lock-icon"></i>
+            <h1>Accès Premium Requis</h1>
+            <p>Débloquez l'intégralité des chapitres pour réussir votre année.</p>
+            <a href="https://paypal.me/RutheesR" target="_blank" class="paypal-link">S'abonner via PayPal</a>
+            <button class="btn btn-outline full-width logout-btn mt-2">Déconnexion</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="#" class="sidebar-link active" data-view="library"><i data-lucide="library"></i>
+                    Bibliothèque</a>
+                <a href="#" class="sidebar-link" id="nav-flashcards" data-view="flashcards"
+                    style="pointer-events:none; opacity:0.3"><i data-lucide="layers"></i> Flashcards</a>
+                <a href="#" class="sidebar-link" id="nav-quiz" data-view="quiz"
+                    style="pointer-events:none; opacity:0.3"><i data-lucide="help-circle"></i> Quiz</a>
+                <a href="#" class="sidebar-link" data-view="favorites"><i data-lucide="star"></i> Mes Favoris</a>
+                <div class="admin-only hidden" id="admin-sidebar-link">
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid var(--border);">
+                    <a href="#" class="sidebar-link" data-view="admin"><i data-lucide="shield-check"></i> Admin</a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="workspace">
+            <!-- View: Library (HOME) -->
+            <section id="view-library" class="view">
+                <div class="workspace-header">
+                    <h1>Ma Bibliothèque Expert</h1>
+                    <p>Contenu conforme au programme scolaire français.</p>
+                </div>
+
+                <div class="filter-bar"
+                    style="display:flex; gap:15px; margin-bottom:30px; background:var(--bg-secondary); padding:15px; border-radius:12px;">
+                    <div style="flex:1">
+                        <label style="font-size:0.8rem; font-weight:700">CLASSE</label>
+                        <select id="f-level" class="form-select" style="width:100%; padding:8px; border-radius:8px;">
+                            <option value="all">Toutes les classes</option>
+                            <option value="CP">CP</option>
+                            <option value="CE1">CE1</option>
+                            <option value="CE2">CE2</option>
+                            <option value="CM1">CM1</option>
+                            <option value="CM2">CM2</option>
+                            <option value="6e">6ème</option>
+                            <option value="5e">5ème</option>
+                            <option value="4e">4ème</option>
+                            <option value="3e">3ème</option>
+                            <option value="2nde">Seconde</option>
+                            <option value="1ere">Première</option>
+                            <option value="Terminale">Terminale</option>
+                        </select>
+                    </div>
+                    <div style="flex:1">
+                        <label style="font-size:0.8rem; font-weight:700">MATIÈRE</label>
+                        <select id="f-subject" class="form-select" style="width:100%; padding:8px; border-radius:8px;">
+                            <option value="all">Toutes les matières</option>
+                            <option value="Maths">Mathématiques</option>
+                            <option value="Français">Français</option>
+                            <option value="SVT">SVT</option>
+                            <option value="Histoire">Histoire</option>
+                            <option value="Physique">Physique-Chimie</option>
+                            <option value="Géo">Géographie</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="lib-grid" class="library-grid"
+                    style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px;">
+                    <!-- Chapters injected from db.js -->
+                </div>
+            </section>
+
+
+
+            <!-- View: Flashcards -->
+            <section id="view-flashcards" class="view hidden">
+                <div class="workspace-header">
+                    <button class="btn btn-sm btn-outline mb-2 back-to-lib"><i data-lucide="chevron-left"></i>
+                        Bibliothèque</button>
+                    <h1 id="title-fc">Nom du Chapitre</h1>
+                </div>
+                <div class="flashcards-container">
+                    <div class="flashcard-main" id="current-flashcard"
+                        style="perspective:1000px; cursor:pointer; height:350px;">
+                        <div class="flashcard-inner"
+                            style="position:relative; width:100%; height:100%; transition:transform 0.6s; transform-style:preserve-3d;">
+                            <div class="flashcard-front"
+                                style="position:absolute; width:100%; height:100%; backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; background:var(--bg-main); border:2px solid var(--primary); border-radius:20px;">
+                                <h4 style="color:var(--primary); margin-bottom:15px">QUESTION</h4>
+                                <p id="card-question" style="font-size:1.4rem; font-weight:600;">Chargement...</p>
+                                <span
+                                    style="position:absolute; bottom:20px; font-size:0.8rem; color:var(--text-muted)">Cliquer
+                                    pour retourner</span>
+                            </div>
+                            <div class="flashcard-back"
+                                style="position:absolute; width:100%; height:100%; backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; background:var(--primary); color:white; border-radius:20px; transform:rotateY(180deg);">
+                                <h4 style="margin-bottom:15px">RÉPONSE</h4>
+                                <p id="card-answer" style="font-size:1.2rem;">Chargement...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="controls"
+                        style="display:flex; align-items:center; justify-content:center; gap:20px; margin-top:30px;">
+                        <button class="btn-icon" id="fc-prev"
+                            style="width:50px; height:50px; border-radius:50%; background:var(--bg-secondary); border:1px solid var(--border);"><i
+                                data-lucide="arrow-left"></i></button>
+                        <span id="fc-count" class="progress-info" style="font-weight:700">0 / 0</span>
+                        <button class="btn-icon" id="fc-next"
+                            style="width:50px; height:50px; border-radius:50%; background:var(--bg-secondary); border:1px solid var(--border);"><i
+                                data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Quiz -->
+            <section id="view-quiz" class="view hidden">
+                <div class="workspace-header">
+                    <button class="btn btn-sm btn-outline mb-2 back-to-lib"><i data-lucide="chevron-left"></i>
+                        Bibliothèque</button>
+                    <h1 id="title-q">Quiz Chapitre</h1>
+                </div>
+                <div class="quiz-container">
+                    <div class="quiz-card-main"
+                        style="background:var(--bg-main); border:1px solid var(--border); border-radius:20px; padding:40px; box-shadow:var(--shadow);">
+                        <div
+                            style="height:6px; width:100%; background:var(--bg-secondary); border-radius:3px; margin-bottom:30px;">
+                            <div id="q-bar"
+                                style="height:100%; background:var(--primary); border-radius:3px; width:0; transition:width 0.3s;">
+                            </div>
+                        </div>
+                        <h3 class="quiz-question" style="margin-bottom:25px; font-size:1.3rem;">Question du quiz...</h3>
+                        <div class="quiz-options" style="display:grid; gap:12px;">
+                            <!-- Options -->
+                        </div>
+                        <div style="margin-top:30px; display:flex; justify-content:flex-end;">
+                            <button id="next-quiz-btn" class="btn btn-primary" disabled>Question suivante</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- View: Admin -->
+            <section id="view-admin" class="view hidden">
+                <div class="workspace-header">
+                    <h1>Administration</h1>
+                    <p>Gestion des utilisateurs et statistiques de la plateforme.</p>
+                </div>
+                <div class="admin-grid"
+                    style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom:30px;">
+                    <div class="stat-card"
+                        style="background:var(--bg-main); padding:20px; border-radius:12px; border:1px solid var(--border);">
+                        <small>Utilisateurs Totaux</small>
+                        <h2 id="stats-total-users">0</h2>
+                    </div>
+                    <div class="stat-card"
+                        style="background:var(--bg-main); padding:20px; border-radius:12px; border:1px solid var(--border);">
+                        <small>Abonnements Mensuels</small>
+                        <h2 id="stats-monthly-plans">0</h2>
+                    </div>
+                    <div class="stat-card"
+                        style="background:var(--bg-main); padding:20px; border-radius:12px; border:1px solid var(--border);">
+                        <small>Abonnements Annuels</small>
+                        <h2 id="stats-annual-plans">0</h2>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+                    <i data-lucide="users"></i> Liste des Utilisateurs Expert
+                </h3>
+                <div id="admin-user-list" class="user-list">
+                    <!-- User list injected by JS -->
+                </div>
+            </section>
+
+            <!-- View: Favorites -->
+            <section id="view-favorites" class="view hidden">
+                <div class="workspace-header">
+                    <h1>Mes Cours Favoris</h1>
+                    <p>Retrouvez ici les chapitres que vous avez marqués comme favoris.</p>
+                </div>
+                <div id="fav-grid" class="library-grid"
+                    style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:20px;">
+                    <!-- Favorite chapters injected by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="db.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
